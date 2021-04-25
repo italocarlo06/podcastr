@@ -8,6 +8,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import styles from './episode.module.scss';
+import { useContext } from 'react';
+import { PlayerContext } from '../../contexts/PlayerContext';
+import Head from 'next/head';
 
 type Episode = {  
   id: string;
@@ -26,9 +29,13 @@ type EpisodeProps = {
   episode: Episode;
 }
 
-export default function Episode({ episode }: EpisodeProps){  
+export default function Episode({ episode }: EpisodeProps){ 
+  const { play }  = useContext(PlayerContext);
   return (
     <div className={styles.episode}>
+      <Head>
+        <title>{episode.title} | Podcastr</title>
+      </Head>
       <div className={styles.thumbnailContainer}>
           <Link href="/">
             <button type="button">
@@ -41,7 +48,7 @@ export default function Episode({ episode }: EpisodeProps){
             height={160}
             objectFit="cover"
           />
-          <button type="button">
+          <button type="button" onClick={() => play(episode)}>
               <img src="/play.svg" alt="Tocar Episódio"></img>
           </button>
       </div>
@@ -87,7 +94,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 }
 
 export const getStaticProps: GetStaticProps = async (ctx) => {
-  const { slug  } =  ctx.params;
+  const { slug  } =  ctx.params;  
   const { data } = await api.get(`/episodes/${slug}`);
   const episode = {
     id: data.id,
